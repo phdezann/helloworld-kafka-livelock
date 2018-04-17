@@ -1,0 +1,88 @@
+version: '2'
+
+services:
+  run:
+    container_name: helloworld-app
+    build:
+      context: docker
+      dockerfile: Dockerfile.maven
+    volumes:
+      - ${M2_REPOSITORY}:/root/.m2/repository
+      - .:/data/app
+    networks:
+      local-helloworld:
+          ipv4_address: ${HELLOWORLD_APP}
+
+  zookeeper:
+    container_name: helloworld-zookeeper
+    image: jplock/zookeeper
+    networks:
+      local-helloworld:
+        ipv4_address: ${HELLOWORLD_ZK}
+        aliases:
+          - helloworld-zookeeper
+
+  kafka:
+    container_name: helloworld-kafka-1
+    build:
+      context: docker
+      dockerfile: Dockerfile.kafka
+    ports:
+      - "9192:9092"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://helloworld-kafka-1:9092
+      - KAFKA_BROKER_ID=101
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    networks:
+      local-helloworld:
+        ipv4_address: ${HELLOWORLD_KAFKA_1}
+        aliases:
+          - helloworld-kafka-1
+
+  kafka2:
+    container_name: helloworld-kafka-2
+    build:
+      context: docker
+      dockerfile: Dockerfile.kafka
+    ports:
+      - "9292:9092"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://helloworld-kafka-2:9092
+      - KAFKA_BROKER_ID=102
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    networks:
+      local-helloworld:
+        ipv4_address: ${HELLOWORLD_KAFKA_2}
+        aliases:
+          - helloworld-kafka-2
+
+  kafka3:
+    container_name: helloworld-kafka-3
+    build:
+      context: docker
+      dockerfile: Dockerfile.kafka
+    ports:
+      - "9392:9092"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://helloworld-kafka-3:9092
+      - KAFKA_BROKER_ID=103
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    networks:
+      local-helloworld:
+        ipv4_address: ${HELLOWORLD_KAFKA_3}
+        aliases:
+          - helloworld-kafka-3
+
+networks:
+  local-helloworld:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.170.0.0/16

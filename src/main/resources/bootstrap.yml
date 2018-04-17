@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: helloworld-kafka
+  cloud:
+    config:
+      enabled: false
+      discovery.enabled: false
+    bus.enabled: false
+
+server:
+  port: 80
+
+management:
+  context-path: /admin
+  security:
+    enabled: false
+
+endpoints:
+  enabled: true
+  actuator:
+    enabled: true
+eureka.client.enabled: false
+hystrix.stream.queue.enabled: false
+ribbon.eureka.enabled: false
+
